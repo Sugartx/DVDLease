@@ -17,7 +17,7 @@ public class Menu {
 	public void mainMenu(){
 		int exit=0;
 		while(exit==0){
-			System.out.println(" main menu");
+//			System.out.println(" main menu");
 			System.out.println(" 1:log");
 			System.out.println(" 2:register");
 			System.out.println(" 3:search");
