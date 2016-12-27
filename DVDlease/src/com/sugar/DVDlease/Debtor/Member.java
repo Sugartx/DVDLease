@@ -88,6 +88,15 @@ public class Member implements Serializable{
 		rent.add(disk);
 	}
 
+	public DVD findDVDfromid(String id){
+		for(DVD disk:rent){
+			if(disk.getId().equals(id)){
+				return disk;
+			}
+		}
+		return null;
+	}
+	
 	public void setPassword(String password) {
 		this.password = password;
 	}

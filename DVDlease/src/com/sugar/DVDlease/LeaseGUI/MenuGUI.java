@@ -48,19 +48,19 @@ public class MenuGUI {
 	JPanel titlePanel, centerPanel, leftPanel;
 	Identity registerIdentity;
 
-	public MenuGUI() throws Exception {
+	public MenuGUI() throws Exception {// 生成frame
 
 		customer = new Member();
 
-		try{
+		try {// 尝试读取文件
 			FileInputStream fis = new FileInputStream(".\\src\\member.dat");
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			m = (Management) ois.readObject();
-			ois.close();		
-		}catch(Exception e){	
-			
-		}finally{
-			if(m==null){
+			ois.close();
+		} catch (Exception e) {
+
+		} finally {
+			if (m == null) {// 如果没生成，则进行初始化
 				m = new Management();
 				Member boss = new Member("tang", "480128", "480128");
 				m.addDebtor(boss);
@@ -76,9 +76,9 @@ public class MenuGUI {
 				m.addDVD(new DVD("Miss Peregrine's Home", "108", "3:23", 30));
 			}
 		}
-		
-		
-		
+
+		// 生成3块容器，上，左下，中右下。
+
 		frame = new JFrame("DVD Tenancy");
 		frame.setLayout(new BorderLayout());
 
@@ -97,19 +97,6 @@ public class MenuGUI {
 		frame.setDefaultCloseOperation(3);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		// test
-		// Member boss = new Member("tang", "480128", "480128");
-		// m.addDebtor(boss);
-		// boss.setIdentityToBOSS();
-		// m.addDVD(new DVD("a", "100", "2:23", 40));
-		// m.addDVD(new DVD("ab", "101", "2:23", 40));
-		// m.addDVD(new DVD("ac", "102", "2:23", 40));
-		// m.addDVD(new DVD("ac", "103", "2:23", 40));
-		// m.addDVD(new DVD("b", "104", "1:23", 10));
-		// m.addDVD(new DVD("b", "105", "1:23", 10));
-		// m.addDVD(new DVD("bc", "106", "1:23", 10));
-		// m.addDVD(new DVD("c", "107", "3:23", 30));
-		// m.addDVD(new DVD("c", "108", "3:23", 30));
 	}
 
 	public void GUIclose() {
@@ -147,7 +134,7 @@ public class MenuGUI {
 		centerPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		centerPanel.setPreferredSize(new Dimension(600, 540));
 		centerPanel.setLayout(new GridLayout(2, 3));
-
+//dasdad
 		MyCanvas[] mc = new MyCanvas[6];
 		Image[] imgs = new Image[6];
 		for (int i = 0; i < 6; i++) {
@@ -226,10 +213,10 @@ public class MenuGUI {
 			customer = m.findDebtor(loginTF.getText());
 			if (customer.getPassword().equals(new String(passwordTF.getPassword()))) {
 				if (customer.isBoss() || customer.isManager()) {
-					registerIdentity=Identity.MANAGER;
+					registerIdentity = Identity.MANAGER;
 					manageMenu("welcome manager");
 				} else {
-					registerIdentity=Identity.DEBTOR;
+					registerIdentity = Identity.DEBTOR;
 					OpearteMenu("");
 					loginMenu("welcome customer");
 				}
@@ -485,12 +472,15 @@ public class MenuGUI {
 		addButton.addActionListener((e) -> {
 			if (m.isDebtorIdExisted(idTF.getText())) {
 				addDVDMenu("id existed");
-			} else {
+			} else if (Integer.valueOf(moneyTF.getText()) > 0) {
+
 				DVD disk = new DVD(nameTF.getText(), idTF.getText(), lengthTF.getText(),
 						Integer.valueOf(moneyTF.getText()));
 				m.addDVD(disk);
-				addDVDMenu("");
+
 				paint(frame);
+			} else {
+				addDVDMenu("输入要大于0");
 			}
 		});
 		emptyRow[1].add(addButton);
@@ -683,14 +673,13 @@ public class MenuGUI {
 				paint(frame);
 			}
 		});
-		backButton.addActionListener((e) -> {			
-			if(registerIdentity==Identity.DEBTOR){				
+		backButton.addActionListener((e) -> {
+			if (registerIdentity == Identity.DEBTOR) {
 				loginMenu("");
 				OpearteMenu("");
-			}
-			else{
+			} else {
 				manageMenu("");
-			}			
+			}
 			paint(frame);
 		});
 		emptyColumn[1].add(changeButton);
@@ -748,15 +737,22 @@ public class MenuGUI {
 	class ReturnButtonAction implements ActionListener {
 		String id;
 		JLabel idLabel;
+		DVD disk;
 
 		public ReturnButtonAction(JLabel idLabel) {
 			this.idLabel = idLabel;
+			disk = new DVD("", "", "", 0);
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			id = idLabel.getText();
-			m.returnDVD(m.findDVDFromId(id), customer);
+			disk = m.findDVDFromId(id);
+			if (disk != null) {
+				m.returnDVD(disk, customer);
+			} else {
+				customer.getRent().remove(customer.findDVDfromid(id));
+			}
 			returnMenu();
 			paint(frame);
 		}
@@ -788,9 +784,13 @@ public class MenuGUI {
 		JButton rechargeButton = new JButton("Recharge");
 		JButton backButton = new JButton("Back");
 		rechargeButton.addActionListener((e) -> {
-			customer.addMoney(Double.valueOf(moneyTF.getText()));
-			loginMenu("");
-			rechargeMenu(customer);		
+			if (Double.valueOf(moneyTF.getText()) < 0) {
+				loginMenu("输入的数要大于0");
+			} else {
+				customer.addMoney(Double.valueOf(moneyTF.getText()));
+				loginMenu("");
+			}
+			rechargeMenu(customer);
 			paint(frame);
 		});
 		backButton.addActionListener((e) -> {
@@ -857,7 +857,7 @@ public class MenuGUI {
 							addComponent(centerPanel, resultLabel[row - 2][i], constraints, i, row, 1, 1);
 						}
 						JButton lease = new JButton("lease");
-						lease.addActionListener(new OpearateButtonAction(resultLabel[row - 2][0], inputTF));
+						lease.addActionListener(new OpearateButtonAction(resultLabel[row - 2][1], inputTF));
 						addComponent(centerPanel, lease, constraints, 5, row, 1, 1);
 						row++;
 					}
@@ -872,20 +872,21 @@ public class MenuGUI {
 	}
 
 	class OpearateButtonAction implements ActionListener {
-		String name;
-		JLabel nameLabel;
+		String id;
+		JLabel idLabel;
 		JTextField searchTF;
 
-		public OpearateButtonAction(JLabel nameLabel, JTextField searchTF) {
-			this.nameLabel = nameLabel;
+		public OpearateButtonAction(JLabel idLabel, JTextField searchTF) {
+			this.idLabel = idLabel;
 			this.searchTF = searchTF;
 		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			name = nameLabel.getText();
+			id = idLabel.getText();
+			System.out.println(id);
 			DVD temp = new DVD("", "", "", 0);
-			temp = m.findDVDFromName(name);
+			temp = m.findDVDFromId(id);
 			if (customer.isCustom(temp.money)) {
 				m.leaseDVD(temp, customer);
 				OpearteMenu(searchTF.getText());

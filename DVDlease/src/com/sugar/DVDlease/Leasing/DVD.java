@@ -11,15 +11,15 @@ enum Status {
 	leased, unleased
 }
 
-public class DVD implements Serializable{
-	String name;
-	String id;
-	String length;
-	public Status state;
-	public Member debtor;
-	public int money;
-	Time starttime;
-	Time endtime;
+public class DVD implements Serializable{//対向流需序列化
+	String name;//名字
+	String id;//每个DVD都有唯一ID
+	String length;//长度
+	public Status state;//租借状态
+	public Member debtor;//借主（如果未租借则无借主，若租完则是上一借主）
+	public int money;//价格
+	Time starttime;//借出时间
+	Time endtime;//应归还时间
 
 	public DVD(String name, String id, String length, int money) {
 		this.name = name;

@@ -130,20 +130,22 @@ public class Management implements Serializable{
 		}
 	}
 
-	public void leaseDVD(DVD disk, Member debtor) {
-		for (DVDlist list : storeroomlist) {
+	public void leaseDVD(DVD disk, Member debtor) {//租借DVD
+		for (DVDlist list : storeroomlist) {//多层循环找到DVD
 			if (list.getName().equals(disk.getName())) {
 				int flag = 0;
 				for (DVD d : list.getdisklist()) {
-					if (d.isUnleased()) {
-						list.leasecount += 1;
-						d.changeStatetoleased();
-						d.setTime();// 获取系统时间
-						d.setDebtor(debtor);// 填入借主的名字
-						debtor.addRent(d);
-						flag = 1;
-						break;
-					}
+					if(d.getId().equals(disk.getId())){
+						if (d.isUnleased()) {//存在该名字DVD，切该DVD没有被租完
+							//list.leasecount += 1;
+							d.changeStatetoleased();//改变DVD状态为借出
+							d.setTime();// 获取系统时间
+							d.setDebtor(debtor);// 填入借主的名字，表示被谁借走
+							debtor.addRent(d);//借主的租借列表中加入DVD
+							flag = 1;
+							break;
+						}
+					}					
 				}
 				if (flag == 0) {
 					System.out.println("DVD insufficient ");
